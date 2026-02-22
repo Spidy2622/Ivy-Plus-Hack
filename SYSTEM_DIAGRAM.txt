@@ -1,5 +1,6 @@
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                    CCHF RISK PREDICTION TOOL - SYSTEM DIAGRAM                 ║
+║           HEMOSENSE - CCHF RISK PREDICTION SYSTEM DIAGRAM v2.1               ║
+║                    Fully Model-Driven ML Architecture                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -10,10 +11,10 @@
 │  ├────────────────┤  ├────────────────┤  ├────────────────────────────────┤ │
 │  │ ☑ Fever        │  │ ☑ Tick Bite    │  │ Platelet Count: [200000]      │ │
 │  │   Days: [0-30] │  │ ☑ Livestock    │  │ Month: [Dropdown]             │ │
-│  │ ☑ Bleeding     │  │ ☑ Rural Area   │  │ Region: [Dropdown]            │ │
-│  │   Days: [0-30] │  │ Occupation:    │  │                               │ │
-│  │ ☑ Headache     │  │   [Dropdown]   │  │ Mode: ◉ Public ○ Doctor       │ │
-│  │ ☑ Vomiting     │  │                │  │                               │ │
+│  │ ☑ Bleeding     │  │ ☑ Slaughter    │  │ Region: [Dropdown]            │ │
+│  │   Days: [0-30] │  │ Occupation:    │  │ ☑ Low WBC                     │ │
+│  │ ☑ Headache     │  │   [Dropdown]   │  │ ☑ Elevated AST/ALT            │ │
+│  │ ☑ Vomiting     │  │                │  │ Mode: ◉ Public ○ Doctor       │ │
 │  │ ☑ Muscle Pain  │  │                │  │                               │ │
 │  └────────────────┘  └────────────────┘  └────────────────────────────────┘ │
 │                                                                               │
@@ -22,43 +23,67 @@
                                       │
                                       ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                         FEATURE CONVERSION LAYER                              │
+│                    FEATURE ENGINEERING LAYER (28 Features)                    │
 │  ┌────────────────────────────────────────────────────────────────────────┐  │
-│  │  • platelet_count → platelet_low (< 150,000)                           │  │
-│  │  • month → season (Winter/Spring/Summer/Fall)                          │  │
-│  │  • fever/bleeding → binary + duration tracking                         │  │
-│  │  • occupation → risk multiplier (0.0 to 0.25)                          │  │
-│  └────────────────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────────────────┘
-                                      │
-                                      ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                         MACHINE LEARNING MODEL                                │
-│  ┌────────────────────────────────────────────────────────────────────────┐  │
-│  │                    RandomForestClassifier                              │  │
-│  │                         (model.pkl)                                    │  │
+│  │  FEATURE CONVERSIONS (No Heuristic Adjustments)                       │  │
 │  │                                                                        │  │
-│  │  Input Features: [fever, bleeding, headache, vomiting, muscle_pain,   │  │
-│  │                   tick_bite, livestock, rural, platelet_low, region]   │  │
+│  │  • platelet_count → platelet_low (binary: < 150,000)                  │  │
+│  │  • month → month_sin = sin(2π × month / 12)  [cyclical encoding]      │  │
+│  │  • month → month_cos = cos(2π × month / 12)  [cyclical encoding]      │  │
+│  │  • occupation → occupation_risk score (0.05–0.40) [input feature]     │  │
+│  │  • region → region_risk score (0.05–0.95) [input feature]             │  │
+│  │  • region → endemic_level (0, 1, 2) [input feature]                   │  │
+│  │  • fever/bleeding → binary indicators + duration tracking             │  │
 │  │                                                                        │  │
-│  │  Output: Base Probabilities [P(low), P(medium), P(high)]              │  │
+│  │  NOTE: All risk factors are encoded as INPUT FEATURES for the model.  │  │
+│  │        No probability multipliers are applied after prediction.        │  │
 │  └────────────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────────┘
                                       │
                                       ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                      POST-PREDICTION ADJUSTMENTS                              │
+│                    MACHINE LEARNING MODELS (Model-Driven)                     │
 │  ┌────────────────────────────────────────────────────────────────────────┐  │
-│  │  1. Apply Occupation Risk: P(high) += occupation_multiplier            │  │
-│  │  2. Apply Seasonal Risk:   P(high) += season_multiplier                │  │
-│  │  3. Normalize Probabilities: Σ P(risk) = 1.0                           │  │
-│  │  4. Final Prediction: argmax(P(low), P(medium), P(high))               │  │
+│  │              GradientBoostingClassifier / RandomForestClassifier       │  │
+│  │                       (model_v2.pkl, stage_model_v2.pkl)               │  │
+│  │                                                                        │  │
+│  │  TRAINING:                                                             │  │
+│  │  • 5-fold stratified cross-validation                                  │  │
+│  │  • 80/20 train/test split                                              │  │
+│  │  • Model comparison: GradientBoosting vs RandomForest vs LogisticReg   │  │
+│  │  • Best model selected by F1-score (macro)                             │  │
+│  │                                                                        │  │
+│  │  INPUT FEATURES (28 total):                                            │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │  │
+│  │  │ SYMPTOMS (10): fever, bleeding, headache, muscle_pain, vomiting │  │  │
+│  │  │                dizziness, neck_pain, photophobia, abdominal,    │  │  │
+│  │  │                diarrhea                                         │  │  │
+│  │  │                                                                 │  │  │
+│  │  │ EXPOSURE (5):  tick_bite, livestock_contact, slaughter_exposure │  │  │
+│  │  │                healthcare_exposure, human_contact               │  │  │
+│  │  │                                                                 │  │  │
+│  │  │ CLINICAL (5):  platelet_low, wbc_low, ast_alt_high,            │  │  │
+│  │  │                liver_impairment, shock_signs                    │  │  │
+│  │  │                                                                 │  │  │
+│  │  │ CONTEXT (3):   occupation_risk, region_risk, endemic_level      │  │  │
+│  │  │                                                                 │  │  │
+│  │  │ TEMPORAL (3):  days_since_tick, days_since_contact, symptom_days│  │  │
+│  │  │                                                                 │  │  │
+│  │  │ SEASONAL (2):  month_sin, month_cos                             │  │  │
+│  │  └─────────────────────────────────────────────────────────────────┘  │  │
+│  │                                                                        │  │
+│  │  OUTPUT: Direct Probabilities from model.predict_proba()              │  │
+│  │  • Risk Model:  [P(Low), P(Medium), P(High)]                          │  │
+│  │  • Stage Model: [P(Early), P(Hemorrhagic), P(Severe)]                 │  │
+│  │                                                                        │  │
+│  │  ⚠️  NO POST-PREDICTION ADJUSTMENTS ARE APPLIED                       │  │
+│  │      All contextual risk factors are learned during training.         │  │
 │  └────────────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────────┘
                                       │
                                       ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                            OUTPUT LAYER                                       │
+│                          OUTPUT & VISUALIZATION LAYER                         │
 │  ┌────────────────────────────────────────────────────────────────────────┐  │
 │  │  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────┐ │  │
 │  │  │   RISK GAUGE     │  │  PROBABILITY     │  │    CONFIDENCE        │ │  │
@@ -67,29 +92,21 @@
 │  │  │      ┌───┐       │  │  ▓▓▓ Low: 20%   │  │  Model Confidence:   │ │  │
 │  │  │     ╱     ╲      │  │  ▓▓▓ Med: 30%   │  │       85.5%          │ │  │
 │  │  │    │   ●   │     │  │  ▓▓▓ High: 50%  │  │                      │ │  │
-│  │  │     ╲     ╱      │  │                  │  │                      │ │  │
+│  │  │     ╲     ╱      │  │                  │  │  (Direct from model) │ │  │
 │  │  │      └───┘       │  │                  │  │                      │ │  │
 │  │  │   🟢 🟡 🔴      │  │  🟢 🟡 🔴      │  │                      │ │  │
 │  │  └──────────────────┘  └──────────────────┘  └──────────────────────┘ │  │
 │  │                                                                        │  │
 │  │  ┌──────────────────────────────────────────────────────────────────┐ │  │
-│  │  │              RISK FACTOR ANALYSIS (Explanation)                  │ │  │
-│  │  │  🔴 Bleeding symptoms (2 days) - Major risk factor               │ │  │
-│  │  │  🟡 Tick bite exposure - Primary transmission route              │ │  │
-│  │  │  🟡 High endemic region (Central Asia) - Risk score: 0.9         │ │  │
-│  │  │  🟡 High-risk occupation (Butcher) - Increased exposure          │ │  │
+│  │  │        STAGE PREDICTION (Model-Driven)                          │ │  │
+│  │  │  Early │ Hemorrhagic │ Severe                                   │ │  │
+│  │  │   ▓▓   │    ▓▓▓▓▓    │   ▓▓                                    │ │  │
 │  │  └──────────────────────────────────────────────────────────────────┘ │  │
 │  │                                                                        │  │
 │  │  ┌──────────────────────────────────────────────────────────────────┐ │  │
-│  │  │              REGIONAL RISK OVERVIEW (Map)                        │ │  │
-│  │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐                         │ │  │
-│  │  │  │🔴 C.Asia │ │🔴 Africa │ │🔴 E.Euro │                         │ │  │
-│  │  │  │  0.9     │ │  0.85    │ │  0.8     │ ← Selected (border)    │ │  │
-│  │  │  └──────────┘ └──────────┘ └──────────┘                         │ │  │
-│  │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐                         │ │  │
-│  │  │  │🟡 M.East │ │🟡 W.Euro │ │🟢 Americ │                         │ │  │
-│  │  │  │  0.7     │ │  0.3     │ │  0.2     │                         │ │  │
-│  │  │  └──────────┘ └──────────┘ └──────────┘                         │ │  │
+│  │  │        AI EXPLANATION (Gemini-Powered)                          │ │  │
+│  │  │  Based on WHO guidelines, explains why the model made its       │ │  │
+│  │  │  prediction given the patient's clinical presentation.          │ │  │
 │  │  └──────────────────────────────────────────────────────────────────┘ │  │
 │  │                                                                        │  │
 │  │  ┌──────────────────────────────────────────────────────────────────┐ │  │
@@ -108,6 +125,29 @@
 └──────────────────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│                   MODEL TRANSPARENCY DASHBOARD                                │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  📊 METRICS TAB                                                        │  │
+│  │  • 5-fold cross-validation results                                    │  │
+│  │  • Holdout test set metrics                                           │  │
+│  │  • Model comparison table (RF vs LR vs GB)                            │  │
+│  │                                                                        │  │
+│  │  📈 ROC CURVES TAB                                                     │  │
+│  │  • Per-class ROC curves for Risk model                                │  │
+│  │  • Per-class ROC curves for Stage model                               │  │
+│  │  • AUC scores displayed                                               │  │
+│  │                                                                        │  │
+│  │  🔢 CONFUSION MATRIX TAB                                               │  │
+│  │  • Risk model confusion matrix heatmap                                │  │
+│  │  • Stage model confusion matrix heatmap                               │  │
+│  │                                                                        │  │
+│  │  ⚡ FEATURE IMPORTANCE TAB                                             │  │
+│  │  • Model-derived feature importance (not heuristic)                   │  │
+│  │  • Top 15 features for both models                                    │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │                         DOCTOR MODE (Optional)                                │
 │  ┌────────────────────────────────────────────────────────────────────────┐  │
 │  │  🔬 Clinical Details                                                   │  │
@@ -115,49 +155,52 @@
 │  │  │  Patient Inputs:        │  │  Exposure History:                  │ │  │
 │  │  │  • Fever: Yes (5 days)  │  │  • Tick Bite: Yes                   │ │  │
 │  │  │  • Bleeding: Yes (2 d)  │  │  • Livestock: Yes                   │ │  │
-│  │  │  • Headache: Yes        │  │  • Rural: Yes                       │ │  │
-│  │  │  • Vomiting: No         │  │  • Occupation: Butcher              │ │  │
-│  │  │  • Muscle Pain: Yes     │  │  • Region: Central Asia             │ │  │
-│  │  │  • Platelet: 80,000     │  │  • Season: Summer (July)            │ │  │
+│  │  │  • Headache: Yes        │  │  • Occupation: Butcher              │ │  │
+│  │  │  • Vomiting: No         │  │  • Region: Turkey                   │ │  │
+│  │  │  • Muscle Pain: Yes     │  │  • Month: July (Summer peak)        │ │  │
+│  │  │  • Platelet: 80,000     │  │  • Endemic Level: High (2)          │ │  │
 │  │  └─────────────────────────┘  └─────────────────────────────────────┘ │  │
-│  └────────────────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                            PDF REPORT EXPORT                                  │
-│  ┌────────────────────────────────────────────────────────────────────────┐  │
-│  │  📄 CCHF Risk Assessment Report                                        │  │
-│  │  ═══════════════════════════════════════════════════════════════════   │  │
-│  │  Patient Information | Exposure & Context | Risk Assessment Results   │  │
-│  │  Medical Advice | Clinical Recommendations | Timestamp & Disclaimer   │  │
-│  │                                                                        │  │
-│  │  [Download: CCHF_Risk_Report_20260221_160500.pdf]                     │  │
 │  └────────────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────────┘
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                           TECHNOLOGY STACK                                    ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
-║  Frontend:  Streamlit (UI Framework)                                         ║
-║  ML Model:  Scikit-learn RandomForestClassifier                              ║
-║  Charts:    Plotly (Gauge, Bar Charts)                                       ║
+║  Frontend:  Streamlit (Multi-page UI Framework)                              ║
+║  ML Model:  Scikit-learn (GradientBoosting / RandomForest)                   ║
+║  Charts:    Plotly (Gauge, Bar Charts, ROC Curves, Heatmaps)                 ║
+║  NLP:       Google Gemini AI (Symptom Parsing, Explanations)                 ║
 ║  Reports:   ReportLab (PDF Generation)                                       ║
 ║  Data:      Pandas, NumPy                                                    ║
-║  Storage:   Pickle (model.pkl, region_encoder.pkl)                           ║
+║  Storage:   Pickle (model_v2.pkl, stage_model_v2.pkl)                        ║
+║             JSON (evaluation_metrics.json, roc_data.json)                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                         FEATURE SUMMARY (11/11)                               ║
+║                    KEY ARCHITECTURE PRINCIPLES                                ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
-║  ✅ 1. Extended Inputs (fever_days, bleeding_days, occupation, month, etc.)  ║
+║  ✅ FULLY MODEL-DRIVEN: All predictions come from trained ML models          ║
+║  ✅ NO HEURISTIC ADJUSTMENTS: No post-prediction probability manipulation    ║
+║  ✅ FEATURES LEARNED DURING TRAINING: Occupation, region, season encoded     ║
+║  ✅ DIRECT MODEL PROBABILITIES: predict_proba() output used directly         ║
+║  ✅ COMPREHENSIVE VALIDATION: 5-fold CV + holdout test set                   ║
+║  ✅ TRANSPARENT EVALUATION: Metrics, ROC, confusion matrix displayed         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         FEATURE SUMMARY                                       ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  ✅ 1. Extended Inputs (28 WHO-aligned features)                             ║
 ║  ✅ 2. Risk Gauge (Plotly gauge with color zones)                            ║
-║  ✅ 3. Risk Map (Card-based regional display)                                ║
-║  ✅ 4. Explanation Panel (Rule-based factor analysis)                        ║
-║  ✅ 5. Season Risk (Month → season multiplier)                               ║
-║  ✅ 6. Occupation Risk (Profession-based adjustment)                         ║
+║  ✅ 3. Regional Risk Display (Endemic level indicator)                       ║
+║  ✅ 4. AI Explanation (Gemini-powered clinical reasoning)                    ║
+║  ✅ 5. Seasonal Encoding (month_sin/cos learned by model)                    ║
+║  ✅ 6. Occupation Risk (Encoded as input feature, not multiplier)            ║
 ║  ✅ 7. Probability Chart (Bar chart with Low/Med/High)                       ║
 ║  ✅ 8. Clinical Recommendations (Risk-stratified protocols)                  ║
-║  ✅ 9. Confidence Indicator (Model confidence %)                             ║
+║  ✅ 9. Confidence Indicator (Direct model confidence %)                      ║
 ║  ✅ 10. Doctor vs Public Mode (Toggle display detail)                        ║
 ║  ✅ 11. PDF Report Export (Comprehensive patient report)                     ║
+║  ✅ 12. Model Transparency Dashboard (Metrics, ROC, Confusion Matrix)        ║
+║  ✅ 13. Outbreak Simulation (Epidemiological scenario modeling)              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝

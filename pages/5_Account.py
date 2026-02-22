@@ -22,7 +22,7 @@ if st.session_state.hs_logged_in:
     q1,q2,q3 = st.columns(3)
     with q1: st.page_link(PAGE_RISK,label="🎯 Risk Assessment",use_container_width=True)
     with q2: st.page_link(PAGE_AI_PARSER,label="🔬 AI Parser",use_container_width=True)
-    with q3: st.page_link(PAGE_CHATBOT,label="🤖 WHO Chatbot",use_container_width=True)
+    with q3: st.page_link(PAGE_CHATBOT,label="🤖 HemoBot",use_container_width=True)
 else:
     t1,t2 = st.tabs(["🔐 Login","📝 Register"])
     with t1:

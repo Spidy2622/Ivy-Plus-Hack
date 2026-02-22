@@ -27,6 +27,6 @@ divider(); section_title("🏥","WHO Alignment")
 st.markdown('<div class="info-box"><h4>26 WHO-Aligned Features</h4><p><strong style="color:#34d399">Symptoms:</strong> Fever, Bleeding, Headache, Muscle Pain, Vomiting, Dizziness, Neck Pain, Photophobia, Abdominal Pain, Diarrhea<br><strong style="color:#fbbf24">Exposure:</strong> Tick Bite, Livestock Contact, Slaughterhouse, Healthcare Setting, CCHF Patient Contact<br><strong style="color:#fb7185">Clinical:</strong> Thrombocytopenia, Leukopenia, Elevated AST/ALT, Liver Impairment, Shock<br><strong style="color:#a78bfa">Context:</strong> Occupation Risk, Region Risk, Endemic Level, Temporal Factors</p></div>',unsafe_allow_html=True)
 
 divider(); section_title("🏆","Credits")
-st.markdown('<div class="info-box"><h4>Ivy Plus Hackathon 2026</h4><p>HemoSense was developed for the <strong style="color:#38bdf8">Ivy Plus Hackathon 2026</strong> to create an accessible AI-powered clinical decision support tool.</p></div>',unsafe_allow_html=True)
+st.markdown('<div class="info-box"><h4>Team Logicraft</h4><p>HemoSense was developed for the <strong style="color:#38bdf8">Ivy Plus Hackathon 2026</strong> to create an accessible AI-powered clinical decision support tool.</p></div>',unsafe_allow_html=True)
 
 render_footer()

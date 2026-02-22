@@ -1,4 +1,4 @@
-"""HemoSense — WHO CCHF Knowledge Chatbot"""
+"""HemoSense — HemoBot"""
 import streamlit as st
 from components import inject_css, render_header, render_nav, render_footer, section_title, divider, setup_ai
 
@@ -13,7 +13,7 @@ def load_who():
     except: return "WHO guidelines not found."
 WHO = load_who()
 
-section_title("🤖","WHO CCHF Knowledge Assistant")
+section_title("🤖","HemoBot")
 st.markdown('<p style="font-family:\'Inter\',sans-serif;font-size:0.9rem;color:#94a3b8;margin-bottom:20px;line-height:1.7;">Ask any CCHF question. Powered by <strong style="color:#cbd5e1;">RAG</strong> using official WHO fact sheets.</p>',unsafe_allow_html=True)
 
 AI_ENABLED, ai_client = setup_ai()

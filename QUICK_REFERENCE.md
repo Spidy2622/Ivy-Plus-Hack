@@ -1,74 +1,79 @@
-# CCHF Risk Prediction Tool - Quick Reference
+# HemoSense - Quick Reference
 
-## 🚀 One-Command Start
-```bash
-quickstart.bat
-```
-
-## 📋 Manual Commands
+## Quick Start
 ```bash
 # Install
 pip install -r requirements.txt
 
-# Test
-python test_app.py
-
-# Train
+# Train models
 python train_model.py
 
 # Run
 streamlit run app.py
 ```
 
-## 🎯 11 Features at a Glance
+## Features at a Glance
 
-| # | Feature | Status | Location in UI |
-|---|---------|--------|----------------|
-| 1 | Extended Inputs | ✅ | Columns 1-3 (fever_days, bleeding_days, occupation, month, platelet_count) |
-| 2 | Risk Gauge | ✅ | Main results area (Plotly gauge with zones) |
-| 3 | Risk Map | ✅ | Regional Risk Overview section (card-based) |
-| 4 | Explanation Panel | ✅ | Risk Factor Analysis section (rule-based) |
-| 5 | Season Risk | ✅ | Automatic (based on month selection) |
-| 6 | Occupation Risk | ✅ | Automatic (based on occupation dropdown) |
-| 7 | Probability Chart | ✅ | Risk Probability Distribution (bar chart) |
-| 8 | Recommendations | ✅ | Clinical Recommendations section |
-| 9 | Confidence | ✅ | Model Confidence metric |
-| 10 | Doctor/Public Mode | ✅ | Sidebar toggle |
-| 11 | PDF Export | ✅ | Bottom of results (Generate PDF button) |
+| # | Feature | Description |
+|---|---------|-------------|
+| 1 | Extended Inputs | 28 WHO-aligned features |
+| 2 | Risk Gauge | Plotly gauge with color zones |
+| 3 | Stage Prediction | Early/Hemorrhagic/Severe |
+| 4 | AI Explanation | Gemini-powered clinical reasoning |
+| 5 | Probability Chart | Bar chart with Low/Med/High |
+| 6 | Confidence Indicator | Direct model probability |
+| 7 | Model Transparency | Metrics, ROC, Confusion Matrix |
+| 8 | Clinical Recommendations | Risk-stratified protocols |
+| 9 | Doctor/Public Mode | Toggle display detail |
+| 10 | PDF Export | Comprehensive report |
+| 11 | Outbreak Simulation | Scenario modeling |
+| 12 | HemoBot | WHO knowledge chatbot |
 
-## 🎨 Color Coding
+## Color Coding
 
-| Color | Meaning | Used In |
-|-------|---------|---------|
-| 🟢 Green | Low Risk (0-33%) | Gauge, bars, messages |
-| 🟡 Yellow | Medium Risk (33-66%) | Gauge, bars, messages |
-| 🔴 Red | High Risk (66-100%) | Gauge, bars, messages |
+| Color | Risk Level | Probability |
+|-------|------------|-------------|
+| 🟢 Green | Low | 0-33% |
+| 🟡 Yellow | Medium | 33-66% |
+| 🔴 Red | High | 66-100% |
 
-## 📊 Risk Adjustments
+## Contextual Risk Factors (Model-Learned)
 
-### Occupation
-- Butcher: +25%
-- Veterinarian: +20%
-- Farmer: +15%
-- Healthcare: +10%
-- Other: +5%
-- Urban: 0%
+All contextual risks are **learned by the ML model during training** — not applied as post-prediction multipliers.
 
-### Season
-- Summer: +10%
-- Spring: +5%
-- Fall: 0%
-- Winter: -5%
+### Occupation Risk Scores (Input Feature)
+| Occupation | Score |
+|------------|-------|
+| Butcher | 0.40 |
+| Veterinarian | 0.38 |
+| Healthcare Worker | 0.35 |
+| Laboratory Worker | 0.32 |
+| Farmer | 0.30 |
+| Urban/Office | 0.05 |
 
-### Region
-- Central Asia: 0.9
-- Africa: 0.85
-- Eastern Europe: 0.8
-- Middle East: 0.7
-- Western Europe: 0.3
-- Americas: 0.2
+### Region Risk Scores (Input Feature)
+| Region | Score | Endemic Level |
+|--------|-------|---------------|
+| Central Asia | 0.95 | High (2) |
+| Turkey | 0.90 | High (2) |
+| Africa | 0.88 | High (2) |
+| Balkans | 0.80 | High (2) |
+| Greece | 0.70 | High (2) |
+| Eastern Europe | 0.60 | Low (1) |
+| Spain | 0.50 | Low (1) |
+| Western Europe | 0.30 | Non (0) |
+| Latin America | 0.15 | Non (0) |
+| USA/Canada | 0.05-0.20 | Non (0) |
 
-## 🏥 Clinical Protocols
+### Seasonal Encoding (Input Feature)
+| Encoding | Formula |
+|----------|---------|
+| `month_sin` | sin(2π × month / 12) |
+| `month_cos` | cos(2π × month / 12) |
+
+**Note**: Cyclical encoding captures seasonality without discontinuity.
+
+## Clinical Protocols
 
 ### High Risk
 - 🏥 Immediate hospitalization
@@ -91,82 +96,92 @@ streamlit run app.py
 - 🩺 Consult if worsening
 - 🦟 Tick prevention
 
-## 📁 Key Files
+## Key Files
 
-| File | Purpose | Size |
-|------|---------|------|
-| app.py | Main application | 18.5 KB |
-| train_model.py | Model training | 1.3 KB |
-| model.pkl | Trained model | Generated |
-| region_encoder.pkl | Region encoder | Generated |
-| requirements.txt | Dependencies | 69 B |
-
-## 📚 Documentation
-
-| File | Content |
+| File | Purpose |
 |------|---------|
-| README.md | Overview & setup |
-| FEATURES.md | Feature details |
-| USAGE_GUIDE.md | User guide |
-| CHANGELOG.md | Version history |
-| PROJECT_SUMMARY.md | Architecture |
-| FEATURE_CHECKLIST.md | Implementation status |
-| QUICK_REFERENCE.md | This file |
+| `app.py` | Main Streamlit router |
+| `train_model.py` | ML training pipeline |
+| `model_v2.pkl` | Trained risk model |
+| `stage_model_v2.pkl` | Trained stage model |
+| `evaluation_metrics.json` | Validation metrics |
+| `roc_data.json` | ROC curve data |
+| `feature_importance.json` | Feature rankings |
 
-## 🔧 Troubleshooting
+## Model Architecture
+
+```
+User Input (28 features)
+    ↓
+Feature Engineering
+    - Cyclical month encoding
+    - Risk scores as features
+    ↓
+GradientBoosting Model
+    - Trained with 5-fold CV
+    - No post-prediction adjustments
+    ↓
+Direct Probability Output
+    - predict_proba() only
+    ↓
+Visualization & Explanation
+```
+
+## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Model not found | Run `python train_model.py` |
-| Import error | Run `pip install -r requirements.txt` |
-| Streamlit won't start | Run `pip install streamlit --upgrade` |
-| PDF fails | Run `pip install reportlab --upgrade` |
+| Model not found | `python train_model.py` |
+| Import error | `pip install -r requirements.txt` |
+| Streamlit won't start | `pip install streamlit --upgrade` |
+| PDF fails | `pip install reportlab --upgrade` |
 
-## 💡 Pro Tips
+## Pro Tips
 
 1. Use Doctor Mode for detailed clinical data
-2. Generate PDF reports for documentation
-3. Check confidence indicator for prediction reliability
-4. Review explanation panel for risk factors
-5. Consider seasonal and occupational context
+2. Review Model Transparency for validation metrics
+3. Check feature importance for key predictors
+4. Generate PDF reports for documentation
+5. Use Outbreak Simulation for scenario planning
 6. Update predictions as symptoms evolve
 
-## ⚠️ Important Notes
+## Important Notes
 
-- Educational purposes only
-- Not a medical diagnosis tool
+- **Fully model-driven prediction** — no heuristic adjustments
+- **Features learned during training** — not applied as multipliers
+- **Direct model probabilities** — no post-processing
+- Educational purposes only — not for clinical diagnosis
+- Trained on synthetic WHO-aligned data
 - Always consult healthcare professionals
-- Model trained on synthetic data
-- Regional scores are approximate
 
-## 📞 Quick Help
+## Quick Help
 
 ```bash
 # Check installation
 python test_app.py
 
-# View model accuracy
+# View training metrics
 python train_model.py
 
 # Access app
 http://localhost:8501
 ```
 
-## 🎓 Example Workflow
+## Example Workflow
 
 1. Select mode (Public/Doctor)
 2. Enter symptoms + duration
 3. Check exposure factors
-4. Select occupation
-5. Input platelet count
-6. Choose month & region
+4. Select occupation & month
+5. Input platelet count & labs
+6. Choose region
 7. Click "Predict Risk Level"
-8. Review gauge, chart, explanations
-9. Read recommendations
+8. Review gauge, chart, AI explanation
+9. Check Model Transparency dashboard
 10. Generate PDF if needed
 
 ---
 
-**Quick Start**: `quickstart.bat`
-**Documentation**: See README.md
-**Support**: Check USAGE_GUIDE.md
+**Documentation**: See README.md  
+**User Guide**: See USAGE_GUIDE.md  
+**Architecture**: See PROJECT_SUMMARY.md

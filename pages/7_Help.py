@@ -15,7 +15,7 @@ for icon,title,desc in [
     ("2️⃣","Describe or Fill","Use 🔬 AI Parser for NLP extraction, or go to 🎯 Risk Assessment directly."),
     ("3️⃣","Run Assessment","Fill symptoms, exposure, labs → click Predict Risk Level."),
     ("4️⃣","Review Explanation","AI generates a WHO-grounded explanation of the prediction."),
-    ("5️⃣","Ask Chatbot","Visit 🤖 WHO Chatbot to ask any CCHF question."),
+    ("5️⃣","Ask Chatbot","Visit 🤖 HemoBot to ask any CCHF question."),
 ]:
     st.markdown(f'<div class="info-box" style="margin-bottom:10px;"><h4>{icon} {title}</h4><p>{desc}</p></div>',unsafe_allow_html=True)
 

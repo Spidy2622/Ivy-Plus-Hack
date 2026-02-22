@@ -1,47 +1,76 @@
 # Changelog
 
+## Version 2.1.0 - Model-Driven Architecture
+
+### Architecture Upgrade
+- **Fully model-driven predictions** — no post-prediction probability manipulation
+- All contextual risk factors (occupation, region, season) are now **input features learned during training**
+- Removed legacy heuristic adjustment logic
+- Direct `model.predict_proba()` output used for all predictions
+
+### Enhanced Training Pipeline
+- Added **GradientBoosting** to model comparison (now best performer)
+- Implemented **80/20 train/test split** with stratification
+- **5-fold cross-validation** on training set
+- Comprehensive evaluation metrics saved to JSON
+- ROC curve data exported for visualization
+- Feature importance extracted from trained models
+
+### New Features
+- **28 input features** (up from 26)
+- **Cyclical month encoding** (month_sin, month_cos) for seasonality
+- **Model Transparency Dashboard** with 4 tabs:
+  - Metrics: CV and test set performance
+  - ROC Curves: Per-class curves with AUC
+  - Confusion Matrix: Heatmaps for both models
+  - Feature Importance: Model-derived rankings
+- **Outbreak Simulation** page for scenario modeling
+- **Stage prediction** with separate trained model
+
+### Documentation Updates
+- All documentation updated to reflect model-driven architecture
+- Removed references to post-prediction multipliers
+- Added sections on model validation and transparency
+- Updated system diagram with accurate ML pipeline
+
+---
+
 ## Version 2.0.0 - Enhanced CCHF Risk Prediction Tool
 
-### 🎉 Major Features Added
+### Major Features Added
 
 #### Data Model Extensions
-- ✅ **fever_days**: Track duration of fever symptoms (0-30 days)
-- ✅ **bleeding_days**: Track duration of bleeding symptoms (0-30 days)
-- ✅ **occupation**: Dropdown selection with risk-weighted occupations
-- ✅ **month**: Month of symptom onset for seasonal risk analysis
-- ✅ **platelet_count**: Numeric input with automatic conversion to platelet_low threshold
+- **fever_days**: Track duration of fever symptoms (0-30 days)
+- **bleeding_days**: Track duration of bleeding symptoms (0-30 days)
+- **occupation**: Dropdown selection with risk-weighted occupations
+- **month**: Month of symptom onset for seasonal risk analysis
+- **platelet_count**: Numeric input with automatic conversion to platelet_low threshold
 
 #### Visualizations
-- ✅ **Risk Gauge**: Plotly gauge chart with color-coded zones (green/yellow/red)
-- ✅ **Probability Distribution Chart**: Bar chart showing Low/Medium/High probabilities
-- ✅ **Regional Risk Map**: Card-based display with highlighted selected region
-- ✅ **Confidence Indicator**: Model confidence percentage display
+- **Risk Gauge**: Plotly gauge chart with color-coded zones (green/yellow/red)
+- **Probability Distribution Chart**: Bar chart showing Low/Medium/High probabilities
+- **Regional Risk Map**: Card-based display with highlighted selected region
+- **Confidence Indicator**: Model confidence percentage display
 
 #### Analytics & Intelligence
-- ✅ **Risk Factor Analysis**: Rule-based explanation of contributing factors
-- ✅ **Seasonal Risk Adjustment**: Month-to-season mapping with risk multipliers
-- ✅ **Occupation Risk Adjustment**: Profession-based risk weighting
-- ✅ **Clinical Recommendation Engine**: Risk-stratified medical protocols
+- **Risk Factor Analysis**: Explanation of contributing factors
+- **Seasonal Risk Encoding**: Month-to-season cyclical encoding
+- **Occupation Risk Encoding**: Profession-based risk scores as features
+- **Clinical Recommendation Engine**: Risk-stratified medical protocols
 
 #### User Experience
-- ✅ **Doctor vs Public Mode**: Toggle between simplified and detailed views
-- ✅ **PDF Report Export**: Comprehensive patient report generation
-- ✅ **Enhanced Layout**: Three-column design for better organization
-- ✅ **Dynamic Form Fields**: Duration inputs auto-enable with symptom selection
+- **Doctor vs Public Mode**: Toggle between simplified and detailed views
+- **PDF Report Export**: Comprehensive patient report generation
+- **Enhanced Layout**: Three-column design for better organization
+- **Dynamic Form Fields**: Duration inputs auto-enable with symptom selection
 
-### 🔧 Technical Improvements
+### Technical Improvements
 
-#### Model Integration
-- No retraining required - all features use post-prediction adjustments
+#### Model Training
 - Feature conversion logic (platelet_count → platelet_low)
-- Probability normalization after adjustments
-- Backward compatible with existing model.pkl
-
-#### Risk Calculation
-- Occupation multipliers: Butcher (+0.25), Vet (+0.20), Farmer (+0.15)
-- Seasonal multipliers: Summer (+0.10), Spring (+0.05), Winter (-0.05)
-- Regional risk scores: Central Asia (0.9), Africa (0.85), Eastern Europe (0.8)
-- Platelet threshold: < 150,000 cells/μL
+- Occupation and region risk scores encoded as input features
+- Seasonal patterns captured via cyclical encoding
+- All risk factors learned by the model during training
 
 #### Code Quality
 - Modular configuration dictionaries
@@ -49,40 +78,18 @@
 - Comprehensive error handling
 - Professional PDF generation with ReportLab
 
-### 📦 Dependencies Added
+### Dependencies
 - plotly: Interactive visualizations
 - reportlab: PDF report generation
+- google-genai: AI-powered explanations
 
-### 📚 Documentation
-- ✅ README.md: Updated with comprehensive feature list
-- ✅ FEATURES.md: Detailed feature documentation
-- ✅ USAGE_GUIDE.md: Complete user guide with examples
-- ✅ CHANGELOG.md: Version history
-- ✅ test_app.py: Pre-flight verification script
-
-### 🎯 Implementation Order Followed
-1. ✅ Extended input features
-2. ✅ Maintained backward compatibility
-3. ✅ Added risk gauge visualization
-4. ✅ Implemented explanation engine
-5. ✅ Added probability chart
-6. ✅ Applied occupation/season adjustments
-7. ✅ Integrated PDF export
-8. ✅ Created regional risk map
-
-### 🔒 Safety Features
-- Input validation (min/max ranges)
-- Probability normalization
-- Graceful degradation if model files missing
-- Clear disclaimers about educational use
-
-### 🎨 UI/UX Enhancements
-- Color-coded risk indicators throughout
-- Emoji icons for visual clarity
-- Responsive three-column layout
-- Conditional field enabling
-- Professional styling with custom CSS
-- Organized information hierarchy
+### Documentation
+- README.md: Comprehensive project overview
+- FEATURES.md: Detailed feature documentation
+- USAGE_GUIDE.md: Complete user guide with examples
+- CHANGELOG.md: Version history
+- PROJECT_SUMMARY.md: Architecture documentation
+- SYSTEM_DIAGRAM.txt: Visual system architecture
 
 ---
 
@@ -102,3 +109,18 @@
 - app.py: Streamlit application
 - requirements.txt: Dependencies
 - README.md: Basic documentation
+
+---
+
+## Migration Notes
+
+### From v2.0.0 to v2.1.0
+- Run `python train_model.py` to regenerate models with new architecture
+- Models now include month_sin/month_cos features
+- Old model.pkl replaced with model_v2.pkl
+- New evaluation artifacts: roc_data.json, feature_importance.json
+
+### Key Changes
+- No code changes needed for existing UI usage
+- Predictions may differ slightly due to model architecture changes
+- All predictions now come directly from trained model (no post-processing)

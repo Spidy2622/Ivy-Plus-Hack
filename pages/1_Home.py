@@ -21,53 +21,66 @@ with col_b:
     with c1:
         st.page_link(PAGE_RISK, label="🎯  Start Risk Assessment", use_container_width=True)
     with c2:
-        st.page_link(PAGE_CHATBOT, label="🤖  Ask WHO Chatbot", use_container_width=True)
+        st.page_link(PAGE_CHATBOT, label="🤖  Ask HemoBot", use_container_width=True)
 
 divider()
 
 st.markdown("""
 <div class="feature-grid">
-    <div class="feature-card">
-        <span class="card-icon">🔬</span>
-        <h3>AI Symptom Parser</h3>
-        <p>Describe your symptoms in plain language and let our Gemini-powered NLP engine
-        automatically extract clinical features — fever duration, tick exposure, bleeding,
-        and 15+ WHO-aligned variables — in seconds.</p>
+    <a href="/AI_Symptom_Parser" target="_self" class="feature-card-link">
+        <div class="feature-card">
+            <span class="card-icon">🔬</span>
+            <h3>AI Symptom Parser</h3>
+            <p>Describe your symptoms in plain language and let our Gemini-powered NLP engine
+            automatically extract clinical features — fever duration, tick exposure, bleeding,
+            and 15+ WHO-aligned variables — in seconds.</p>
+        </div>
+    </a>
+    <a href="/Risk_Assessment" target="_self" class="feature-card-link">
+        <div class="feature-card">
+            <span class="card-icon">🎯</span>
+            <h3>Risk Assessment</h3>
+            <p>Enter 26 WHO-aligned clinical, exposure, and laboratory features into our
+            Random Forest model to receive an instant risk level (Low / Medium / High)
+            and predicted disease stage with confidence scores and gauge visualisation.</p>
+        </div>
+    </a>
+    <a href="/HemoBot" target="_self" class="feature-card-link">
+        <div class="feature-card">
+            <span class="card-icon">🤖</span>
+            <h3>HemoBot</h3>
+            <p>Our intelligent knowledge assistant is trained on the latest official World
+            Health Organization fact sheets. Ask any question about CCHF symptoms, transmission,
+            or guidelines and get instant, reliable answers.</p>
+        </div>
+    </a>
+    <div class="feature-card-link" style="cursor: default;">
+        <div class="feature-card">
+            <span class="card-icon">👨‍⚕️</span>
+            <h3>Doctor & Public Modes</h3>
+            <p>Toggle between a simplified patient-friendly interface and a detailed
+            clinician view showing complete exposure history, temporal context,
+            lab breakdowns, and confidence intervals via the ⚙️ menu.</p>
+        </div>
     </div>
-    <div class="feature-card">
-        <span class="card-icon">🎯</span>
-        <h3>Risk Assessment</h3>
-        <p>Enter 26 WHO-aligned clinical, exposure, and laboratory features into our
-        Random Forest model to receive an instant risk level (Low / Medium / High)
-        and predicted disease stage with confidence scores and gauge visualisation.</p>
-    </div>
-    <div class="feature-card">
-        <span class="card-icon">🤖</span>
-        <h3>WHO Knowledge Chatbot</h3>
-        <p>Ask any question about CCHF and get answers grounded in official WHO fact sheets.
-        Our RAG system ensures responses are accurate, referenced, and non-diagnostic.</p>
-    </div>
-    <div class="feature-card">
-        <span class="card-icon">👨‍⚕️</span>
-        <h3>Doctor & Public Modes</h3>
-        <p>Toggle between a simplified patient-friendly interface and a detailed
-        clinician view showing complete exposure history, temporal context,
-        lab breakdowns, and confidence intervals via the ☰ menu.</p>
-    </div>
-    <div class="feature-card">
-        <span class="card-icon">📄</span>
-        <h3>PDF Clinical Reports</h3>
-        <p>Generate downloadable PDF reports featuring patient information,
-        risk assessment results with colour-coded severity, clinical recommendations,
-        and timestamped disclaimers — ready for medical records.</p>
-    </div>
-    <div class="feature-card">
-        <span class="card-icon">🗺️</span>
-        <h3>Regional Risk Mapping</h3>
-        <p>Visualise endemic risk across 10 geographic regions — from low-risk
-        North America to high-endemic Turkey and the Balkans. Region selection
-        automatically adjusts risk and endemic level features.</p>
-    </div>
+    <a href="/Risk_Assessment" target="_self" class="feature-card-link">
+        <div class="feature-card">
+            <span class="card-icon">📄</span>
+            <h3>PDF Clinical Reports</h3>
+            <p>Generate downloadable PDF reports featuring patient information,
+            risk assessment results with colour-coded severity, clinical recommendations,
+            and timestamped disclaimers — ready for medical records.</p>
+        </div>
+    </a>
+    <a href="/Risk_Assessment" target="_self" class="feature-card-link">
+        <div class="feature-card">
+            <span class="card-icon">🗺️</span>
+            <h3>Regional Risk Mapping</h3>
+            <p>Visualise endemic risk across 10 geographic regions — from low-risk
+            North America to high-endemic Turkey and the Balkans. Region selection
+            automatically adjusts risk and endemic level features.</p>
+        </div>
+    </a>
 </div>
 """, unsafe_allow_html=True)
 

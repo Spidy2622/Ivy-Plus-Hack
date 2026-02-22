@@ -1,0 +1,230 @@
+{
+  "risk": [
+    {
+      "feature": "platelet_low",
+      "importance": 0.24257355193212762
+    },
+    {
+      "feature": "region_risk",
+      "importance": 0.19010625734774994
+    },
+    {
+      "feature": "endemic_level",
+      "importance": 0.11745674088366537
+    },
+    {
+      "feature": "bleeding",
+      "importance": 0.08182859107945036
+    },
+    {
+      "feature": "occupation_risk",
+      "importance": 0.07607296574585184
+    },
+    {
+      "feature": "shock_signs",
+      "importance": 0.06865100769152134
+    },
+    {
+      "feature": "symptom_days",
+      "importance": 0.06276529865629424
+    },
+    {
+      "feature": "fever",
+      "importance": 0.04988000217483655
+    },
+    {
+      "feature": "liver_impairment",
+      "importance": 0.04370158430402406
+    },
+    {
+      "feature": "livestock_contact",
+      "importance": 0.03582009188818892
+    },
+    {
+      "feature": "slaughter_exposure",
+      "importance": 0.016262222042561565
+    },
+    {
+      "feature": "healthcare_exposure",
+      "importance": 0.008874449793518265
+    },
+    {
+      "feature": "days_since_tick",
+      "importance": 0.002901374629579234
+    },
+    {
+      "feature": "tick_bite",
+      "importance": 0.001624513554209277
+    },
+    {
+      "feature": "month_cos",
+      "importance": 0.0002564008639022306
+    },
+    {
+      "feature": "month_sin",
+      "importance": 0.000254703327483357
+    },
+    {
+      "feature": "days_since_contact",
+      "importance": 0.00022622050171001418
+    },
+    {
+      "feature": "wbc_low",
+      "importance": 0.00016310716511521703
+    },
+    {
+      "feature": "ast_alt_high",
+      "importance": 8.90786256634604e-05
+    },
+    {
+      "feature": "headache",
+      "importance": 8.743632961118467e-05
+    },
+    {
+      "feature": "neck_pain",
+      "importance": 8.690323901330789e-05
+    },
+    {
+      "feature": "vomiting",
+      "importance": 7.816227891554935e-05
+    },
+    {
+      "feature": "diarrhea",
+      "importance": 6.988409991348891e-05
+    },
+    {
+      "feature": "dizziness",
+      "importance": 5.503676723094722e-05
+    },
+    {
+      "feature": "muscle_pain",
+      "importance": 4.509576286164534e-05
+    },
+    {
+      "feature": "abdominal_pain",
+      "importance": 3.081761502731363e-05
+    },
+    {
+      "feature": "photophobia",
+      "importance": 2.178390478489748e-05
+    },
+    {
+      "feature": "human_contact",
+      "importance": 1.671779518890339e-05
+    }
+  ],
+  "stage": [
+    {
+      "feature": "platelet_low",
+      "importance": 0.24257355193212762
+    },
+    {
+      "feature": "region_risk",
+      "importance": 0.19010625734774994
+    },
+    {
+      "feature": "endemic_level",
+      "importance": 0.11745674088366537
+    },
+    {
+      "feature": "bleeding",
+      "importance": 0.08182859107945036
+    },
+    {
+      "feature": "occupation_risk",
+      "importance": 0.07607296574585184
+    },
+    {
+      "feature": "shock_signs",
+      "importance": 0.06865100769152134
+    },
+    {
+      "feature": "symptom_days",
+      "importance": 0.06276529865629424
+    },
+    {
+      "feature": "fever",
+      "importance": 0.04988000217483655
+    },
+    {
+      "feature": "liver_impairment",
+      "importance": 0.04370158430402406
+    },
+    {
+      "feature": "livestock_contact",
+      "importance": 0.03582009188818892
+    },
+    {
+      "feature": "slaughter_exposure",
+      "importance": 0.016262222042561565
+    },
+    {
+      "feature": "healthcare_exposure",
+      "importance": 0.008874449793518265
+    },
+    {
+      "feature": "days_since_tick",
+      "importance": 0.002901374629579234
+    },
+    {
+      "feature": "tick_bite",
+      "importance": 0.001624513554209277
+    },
+    {
+      "feature": "month_cos",
+      "importance": 0.0002564008639022306
+    },
+    {
+      "feature": "month_sin",
+      "importance": 0.000254703327483357
+    },
+    {
+      "feature": "days_since_contact",
+      "importance": 0.00022622050171001418
+    },
+    {
+      "feature": "wbc_low",
+      "importance": 0.00016310716511521703
+    },
+    {
+      "feature": "ast_alt_high",
+      "importance": 8.90786256634604e-05
+    },
+    {
+      "feature": "headache",
+      "importance": 8.743632961118467e-05
+    },
+    {
+      "feature": "neck_pain",
+      "importance": 8.690323901330789e-05
+    },
+    {
+      "feature": "vomiting",
+      "importance": 7.816227891554935e-05
+    },
+    {
+      "feature": "diarrhea",
+      "importance": 6.988409991348891e-05
+    },
+    {
+      "feature": "dizziness",
+      "importance": 5.503676723094722e-05
+    },
+    {
+      "feature": "muscle_pain",
+      "importance": 4.509576286164534e-05
+    },
+    {
+      "feature": "abdominal_pain",
+      "importance": 3.081761502731363e-05
+    },
+    {
+      "feature": "photophobia",
+      "importance": 2.178390478489748e-05
+    },
+    {
+      "feature": "human_contact",
+      "importance": 1.671779518890339e-05
+    }
+  ]
+}
