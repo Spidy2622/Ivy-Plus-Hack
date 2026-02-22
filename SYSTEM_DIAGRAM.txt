@@ -1,0 +1,163 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    CCHF RISK PREDICTION TOOL - SYSTEM DIAGRAM                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              USER INTERFACE                                   │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────────┐ │
+│  │   COLUMN 1     │  │   COLUMN 2     │  │         COLUMN 3               │ │
+│  │   Symptoms     │  │   Exposure     │  │   Clinical & Context           │ │
+│  ├────────────────┤  ├────────────────┤  ├────────────────────────────────┤ │
+│  │ ☑ Fever        │  │ ☑ Tick Bite    │  │ Platelet Count: [200000]      │ │
+│  │   Days: [0-30] │  │ ☑ Livestock    │  │ Month: [Dropdown]             │ │
+│  │ ☑ Bleeding     │  │ ☑ Rural Area   │  │ Region: [Dropdown]            │ │
+│  │   Days: [0-30] │  │ Occupation:    │  │                               │ │
+│  │ ☑ Headache     │  │   [Dropdown]   │  │ Mode: ◉ Public ○ Doctor       │ │
+│  │ ☑ Vomiting     │  │                │  │                               │ │
+│  │ ☑ Muscle Pain  │  │                │  │                               │ │
+│  └────────────────┘  └────────────────┘  └────────────────────────────────┘ │
+│                                                                               │
+│                      [🔵 Predict Risk Level Button]                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         FEATURE CONVERSION LAYER                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  • platelet_count → platelet_low (< 150,000)                           │  │
+│  │  • month → season (Winter/Spring/Summer/Fall)                          │  │
+│  │  • fever/bleeding → binary + duration tracking                         │  │
+│  │  • occupation → risk multiplier (0.0 to 0.25)                          │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         MACHINE LEARNING MODEL                                │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │                    RandomForestClassifier                              │  │
+│  │                         (model.pkl)                                    │  │
+│  │                                                                        │  │
+│  │  Input Features: [fever, bleeding, headache, vomiting, muscle_pain,   │  │
+│  │                   tick_bite, livestock, rural, platelet_low, region]   │  │
+│  │                                                                        │  │
+│  │  Output: Base Probabilities [P(low), P(medium), P(high)]              │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                      POST-PREDICTION ADJUSTMENTS                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  1. Apply Occupation Risk: P(high) += occupation_multiplier            │  │
+│  │  2. Apply Seasonal Risk:   P(high) += season_multiplier                │  │
+│  │  3. Normalize Probabilities: Σ P(risk) = 1.0                           │  │
+│  │  4. Final Prediction: argmax(P(low), P(medium), P(high))               │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            OUTPUT LAYER                                       │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────┐ │  │
+│  │  │   RISK GAUGE     │  │  PROBABILITY     │  │    CONFIDENCE        │ │  │
+│  │  │   (Plotly)       │  │  CHART (Plotly)  │  │    INDICATOR         │ │  │
+│  │  │                  │  │                  │  │                      │ │  │
+│  │  │      ┌───┐       │  │  ▓▓▓ Low: 20%   │  │  Model Confidence:   │ │  │
+│  │  │     ╱     ╲      │  │  ▓▓▓ Med: 30%   │  │       85.5%          │ │  │
+│  │  │    │   ●   │     │  │  ▓▓▓ High: 50%  │  │                      │ │  │
+│  │  │     ╲     ╱      │  │                  │  │                      │ │  │
+│  │  │      └───┘       │  │                  │  │                      │ │  │
+│  │  │   🟢 🟡 🔴      │  │  🟢 🟡 🔴      │  │                      │ │  │
+│  │  └──────────────────┘  └──────────────────┘  └──────────────────────┘ │  │
+│  │                                                                        │  │
+│  │  ┌──────────────────────────────────────────────────────────────────┐ │  │
+│  │  │              RISK FACTOR ANALYSIS (Explanation)                  │ │  │
+│  │  │  🔴 Bleeding symptoms (2 days) - Major risk factor               │ │  │
+│  │  │  🟡 Tick bite exposure - Primary transmission route              │ │  │
+│  │  │  🟡 High endemic region (Central Asia) - Risk score: 0.9         │ │  │
+│  │  │  🟡 High-risk occupation (Butcher) - Increased exposure          │ │  │
+│  │  └──────────────────────────────────────────────────────────────────┘ │  │
+│  │                                                                        │  │
+│  │  ┌──────────────────────────────────────────────────────────────────┐ │  │
+│  │  │              REGIONAL RISK OVERVIEW (Map)                        │ │  │
+│  │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐                         │ │  │
+│  │  │  │🔴 C.Asia │ │🔴 Africa │ │🔴 E.Euro │                         │ │  │
+│  │  │  │  0.9     │ │  0.85    │ │  0.8     │ ← Selected (border)    │ │  │
+│  │  │  └──────────┘ └──────────┘ └──────────┘                         │ │  │
+│  │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐                         │ │  │
+│  │  │  │🟡 M.East │ │🟡 W.Euro │ │🟢 Americ │                         │ │  │
+│  │  │  │  0.7     │ │  0.3     │ │  0.2     │                         │ │  │
+│  │  │  └──────────┘ └──────────┘ └──────────┘                         │ │  │
+│  │  └──────────────────────────────────────────────────────────────────┘ │  │
+│  │                                                                        │  │
+│  │  ┌──────────────────────────────────────────────────────────────────┐ │  │
+│  │  │           CLINICAL RECOMMENDATIONS                               │ │  │
+│  │  │  🏥 Immediate hospitalization and isolation                      │ │  │
+│  │  │  🧪 PCR testing for CCHF virus confirmation                      │ │  │
+│  │  │  💉 Supportive care and ribavirin therapy consideration          │ │  │
+│  │  │  🩸 Monitor coagulation parameters and platelet count            │ │  │
+│  │  │  ⚠️ Implement strict infection control measures                 │ │  │
+│  │  └──────────────────────────────────────────────────────────────────┘ │  │
+│  │                                                                        │  │
+│  │  ┌──────────────────────────────────────────────────────────────────┐ │  │
+│  │  │  [📄 Generate PDF Report]  [⬇️ Download PDF Report]             │ │  │
+│  │  └──────────────────────────────────────────────────────────────────┘ │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         DOCTOR MODE (Optional)                                │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  🔬 Clinical Details                                                   │  │
+│  │  ┌─────────────────────────┐  ┌─────────────────────────────────────┐ │  │
+│  │  │  Patient Inputs:        │  │  Exposure History:                  │ │  │
+│  │  │  • Fever: Yes (5 days)  │  │  • Tick Bite: Yes                   │ │  │
+│  │  │  • Bleeding: Yes (2 d)  │  │  • Livestock: Yes                   │ │  │
+│  │  │  • Headache: Yes        │  │  • Rural: Yes                       │ │  │
+│  │  │  • Vomiting: No         │  │  • Occupation: Butcher              │ │  │
+│  │  │  • Muscle Pain: Yes     │  │  • Region: Central Asia             │ │  │
+│  │  │  • Platelet: 80,000     │  │  • Season: Summer (July)            │ │  │
+│  │  └─────────────────────────┘  └─────────────────────────────────────┘ │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            PDF REPORT EXPORT                                  │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  📄 CCHF Risk Assessment Report                                        │  │
+│  │  ═══════════════════════════════════════════════════════════════════   │  │
+│  │  Patient Information | Exposure & Context | Risk Assessment Results   │  │
+│  │  Medical Advice | Clinical Recommendations | Timestamp & Disclaimer   │  │
+│  │                                                                        │  │
+│  │  [Download: CCHF_Risk_Report_20260221_160500.pdf]                     │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           TECHNOLOGY STACK                                    ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  Frontend:  Streamlit (UI Framework)                                         ║
+║  ML Model:  Scikit-learn RandomForestClassifier                              ║
+║  Charts:    Plotly (Gauge, Bar Charts)                                       ║
+║  Reports:   ReportLab (PDF Generation)                                       ║
+║  Data:      Pandas, NumPy                                                    ║
+║  Storage:   Pickle (model.pkl, region_encoder.pkl)                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         FEATURE SUMMARY (11/11)                               ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  ✅ 1. Extended Inputs (fever_days, bleeding_days, occupation, month, etc.)  ║
+║  ✅ 2. Risk Gauge (Plotly gauge with color zones)                            ║
+║  ✅ 3. Risk Map (Card-based regional display)                                ║
+║  ✅ 4. Explanation Panel (Rule-based factor analysis)                        ║
+║  ✅ 5. Season Risk (Month → season multiplier)                               ║
+║  ✅ 6. Occupation Risk (Profession-based adjustment)                         ║
+║  ✅ 7. Probability Chart (Bar chart with Low/Med/High)                       ║
+║  ✅ 8. Clinical Recommendations (Risk-stratified protocols)                  ║
+║  ✅ 9. Confidence Indicator (Model confidence %)                             ║
+║  ✅ 10. Doctor vs Public Mode (Toggle display detail)                        ║
+║  ✅ 11. PDF Report Export (Comprehensive patient report)                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
