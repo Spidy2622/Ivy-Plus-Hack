@@ -113,12 +113,15 @@ This generates:
 - `roc_data.json` - ROC curve data
 - `feature_importance.json` - Feature importance scores
 
-### Launch Application
+### Run Locally
 
 ```bash
 streamlit run app.py
 ```
-
+### Hosted site
+```
+https://ivy-plus-hack-aapt3pu5hdvjhedgn8ydnk.streamlit.app/
+```
 ## Architecture
 
 ```
